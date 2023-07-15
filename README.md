@@ -64,5 +64,3 @@ We have a number of exciting features in the pipeline for our app. Here's a snea
 - **Tree Process**: THe option to allow running ADB processes to proceed without requiring ScreenDroid to be open.
 
 Stay tuned for updates on these exciting new features!
-
-Thank You In Advance!
