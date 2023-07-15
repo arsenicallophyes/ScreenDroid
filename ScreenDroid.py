@@ -1,3 +1,9 @@
+"""
+    ScreenDroid  Copyright (C) 2023  arsenicallophyes
+    This program comes with ABSOLUTELY NO WARRANTY.
+    This is free software, and you are welcome to redistribute it
+    under certain conditions.
+"""
 from tkinter import *
 import subprocess, os, sys, time, threading, random, imageio, re
 from tkinter import messagebox
