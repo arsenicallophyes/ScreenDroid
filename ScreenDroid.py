@@ -29,7 +29,7 @@ vid_playback_startup = True
 
 
 try:
-    os.chdir(f"{sys._MEIPASS}\\addons")  # if compiled using pyinstaller (autopy2exe)
+    os.chdir(os.path.dirname(__file__))  # if compiled using nuitka
 except:
     try:
         path_dir = input(
