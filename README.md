@@ -2,11 +2,16 @@
 
 ScreenDroid is an Android debugger that allows you to share your Android device's screen wirelessly or via USB. It has a CLI interface in version 1 and a GUI interface in version 2.
 
+## Preview
+
+![ScreenDroid Preview](preview.png)
+
 ## Features
 
 - Version 1 (Deprecated): Supports one device at a time and has a limited set of features.
 - Version 2: Supports multiple devices, routing traffic to a specific adapter, and has a full feature set. It also has a startup animation and prevents multiple instances of the process from running. It has keybinds for refreshing, killing processes, and exiting the application.
 - **New Feature**: QR Code Pairing with Zeroconf for seamless device pairing over the network.
+- **New Feature**: Window Resizing (Beta): Resizing the window is now enabled. This feature is currently in beta and not fully implemented, so some issues might occur. Using the default size should not have any issues.
 
 ## Built With
 
@@ -41,9 +46,8 @@ On the latest version, the app has only been tested on the Samsung Galaxy S10 (A
 
 ## Development
 
-Our app was developed and tested on Python 3.9 to 3.10.4.
-It is currently being developed and tested on Python 3.10 to 3.X, with the latest version tested only on Python 3.12.0.
-
+Our app was developed and tested on Python 3.12.0.
+We welcome contributions and feedback from the community to improve and stabilize the application.
 
 ## Known Issues
 
@@ -77,15 +81,13 @@ threading.Thread(target=multiple_instances_eliminator).start()
 ## New Features
 
 - **Window Resizing**: Resizing the window is now enabled. This feature is currently in beta and not fully implemented, so some issues might occur. Using the default size should not have any issues.
+- **QR Code Pairing with Zeroconf**: We have added a new feature that allows for seamless device pairing over the network using QR codes and Zeroconf. This feature requires the Bonjour service to be installed, and the app will prompt for admin privileges during the first startup to install the necessary files. Here’s how it works:
+  1. **Zeroconf Service Discovery**: The app uses Zeroconf to broadcast its presence on the local network, making it discoverable by other devices.
+  2. **QR Code Generation**: A QR code is generated to encode the service information. This QR code can be scanned by the Android device to pair with the app.
+  3. **Automatic Bonjour Installation**: If Bonjour is not installed, the app will request admin privileges to install it, ensuring smooth operation.
+  4. **Admin Privileges Request**: The app will ask for admin privileges automatically during the first startup to install the necessary files.
 
-## QR Code Pairing with Zeroconf
 
-We have added a new feature that allows for seamless device pairing over the network using QR codes and Zeroconf. This feature requires the Bonjour service to be installed, and the app will prompt for admin privileges during the first startup to install the necessary files. Here’s how it works:
-
-1. **Zeroconf Service Discovery**: The app uses Zeroconf to broadcast its presence on the local network, making it discoverable by other devices.
-2. **QR Code Generation**: A QR code is generated to encode the service information. This QR code can be scanned by the Android device to pair with the app.
-3. **Automatic Bonjour Installation**: If Bonjour is not installed, the app will request admin privileges to install it, ensuring smooth operation.
-4. **Admin Privileges Request**: The app will ask for admin privileges automatically during the first startup to install the necessary files.
 
 ## Upcoming Features
 
@@ -97,6 +99,7 @@ We have a number of exciting features in the pipeline for our app. Here's a snea
 - **Update Mechanism**: An update mechanism will be added.
 
 Stay tuned for updates on these exciting new features!
+
 
 ## Modules Used
 
