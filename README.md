@@ -49,11 +49,12 @@ It is currently being developed and tested on Python 3.10 to 3.X, with the lates
 
 We are aware of the following issues with our app:
 
-- Slow Startup (Improved in the latest version)
-- Low Quality UI and Old Design (The design is now more modern and up to date)
+- There is a minor issue with the new QR code pairing via Zeroconf, where the app occasionally fails to connect to the phone. This happens because the phone may stop sending mDNS requests at regular intervals, preventing the app from detecting it. To avoid this problem, turn on wireless debugging only when you need to use the QR code pairing feature and turn it off when not in use, rather than leaving it on all the time.
 
 ## Fixed Issues
 
+- Slow Startup (Improved in the latest version)
+- Low Quality UI and Old Design (The design is now more modern and up to date)
 - The bug preventing the device's name from disappearing from the list box when running a task has been fixed.
 - The `ADBV2.lock` file is no longer used. We now use a socket IPC method to prevent multiple instances. Here is the updated implementation:
 
@@ -73,6 +74,10 @@ def multiple_instances_eliminator():
 
 threading.Thread(target=multiple_instances_eliminator).start()
 ```
+## New Features
+
+- **Window Resizing**: Resizing the window is now enabled. This feature is currently in beta and not fully implemented, so some issues might occur. Using the default size should not have any issues.
+
 ## QR Code Pairing with Zeroconf
 
 We have added a new feature that allows for seamless device pairing over the network using QR codes and Zeroconf. This feature requires the Bonjour service to be installed, and the app will prompt for admin privileges during the first startup to install the necessary files. Here’s how it works:
