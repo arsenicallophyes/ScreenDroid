@@ -86,7 +86,13 @@ threading.Thread(target=multiple_instances_eliminator).start()
   2. **QR Code Generation**: A QR code is generated to encode the service information. This QR code can be scanned by the Android device to pair with the app.
   3. **Automatic Bonjour Installation**: If Bonjour is not installed, the app will request admin privileges to install it, ensuring smooth operation.
   4. **Admin Privileges Request**: The app will ask for admin privileges automatically during the first startup to install the necessary files.
-
+- **PIN Pairing with Autodetect**: We've introduced PIN pairing alongside QR code pairing. When attempting to connect via PIN, the app will automatically detect the IP address, port, and PIN to auto-complete the input section for convenience.
+- **Network Verification**: All network operations involving connecting a phone will now verify the IP address within the network range and attempt to ping the device. Connection will only be established if both tests are successful. These options can be disabled from settings.
+- **Screen Off Option**: Users can now choose to turn off their phone screen while sharing the screen with their PC.
+- **Preferred Connection Method**:
+  - Defaults to Any: Allows the app to use any available connection method.
+  - Wired Mode: Disconnects all wireless connections that are connected both with wire and wireless. If a device is connected wirelessly only, it will not get disconnected.
+  - Wireless Mode: Hides the wired devices from the devices selection list. If a device is connected via both wire and wireless, wired-only devices will not be hidden.
 
 
 ## Upcoming Features
