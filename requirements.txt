@@ -1,4 +1,4 @@
 Pillow>=10.0.1
-imageio>=2.31.6
+imageio==2.4.1
 qrcode>=7.4.2
 zeroconf==0.119.0
