@@ -4,7 +4,7 @@ ScreenDroid is an Android debugger that allows you to share your Android device'
 
 ## Preview
 
-![ScreenDroid Preview](preview.png)
+![ScreenDroid Preview](https://github.com/arsenicallophyes/ScreenDroid/assets/120115529/643da152-902b-48d4-b0f1-1bcc2baeab25)
 
 ## Features
 
