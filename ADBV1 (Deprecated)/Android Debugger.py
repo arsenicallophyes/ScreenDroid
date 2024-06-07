@@ -10,8 +10,7 @@ import winshell
 import random
 import getpass
 import shutil
-path_dir = fr"{input('Script Directory: ')}\addons"
-os.chdir(path_dir)
+os.chdir(os.path.dirname(__file__)+os.pathsep+"addons")
 def random_logo():
     drawing_logo = random.randint(1,2)
     os.system('cls')
