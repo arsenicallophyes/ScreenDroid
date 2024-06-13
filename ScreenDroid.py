@@ -20,12 +20,12 @@ For any inquiries or questions, you can reach out to me via electronic mail at "
 
 from tkinter import *
 import subprocess, os, threading, random, imageio, re, socket, qrcode, hashlib, ctypes, time, ipaddress
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 from uuid import uuid4
 from PIL import Image, ImageTk
 from zeroconf import ServiceBrowser, Zeroconf
 from io import BytesIO
-from collections import Counter
+from collections import defaultdict
 os.environ['PATH'] = rf"{os.path.dirname(__file__)}\lib" + os.pathsep + os.environ['PATH']
 ctypes.windll.shcore.SetProcessDpiAwareness(True) # increases DPI for better image
 
@@ -145,7 +145,7 @@ def vid_playback_4_startup():
         frame_image = ImageTk.PhotoImage(Image.fromarray(image).resize(window_size))
         startup_label.config(image=frame_image)
         startup_label.image = frame_image
-        if vid_playback_startup != True:
+        if not vid_playback_startup:
             main_page.pack()
             startup_label.pack_forget()
         time.sleep(0.00_00_8)
@@ -154,7 +154,7 @@ def vid_playback_4_startup():
             frame_image = ImageTk.PhotoImage(Image.fromarray(image).resize(window_size))
             startup_label.config(image=frame_image)
             startup_label.image = frame_image
-            if vid_playback_startup != True:
+            if not vid_playback_startup:
                 main_page.pack()
                 startup_label.pack_forget()
                 return
@@ -268,7 +268,7 @@ class Connector:
         self.pin_pair = pin_pair
         self.device_name :str = device_name
         WIRELESS_CONNECTION_MDNS_STATUS = False
-        # print("class initialized")
+        print("class initialized")
 
     def remove_service(self, zeroconf, type, name):
         pass
@@ -284,9 +284,9 @@ class Connector:
         if self.mode == 'background':
             subprocess.run(f'adb connect {servc_info.server}:{servc_info.port}',shell=True)
         elif self.mode == 'foreground':
-            # print(phone_ip,":",servc_info.port,self.device_name)
+            print(phone_ip,":",servc_info.port,self.device_name)
             connection_process = subprocess.run(["adb","connect",f"{phone_ip}:{servc_info.port}"],shell=True,capture_output=True)
-            # print('done')
+            print('done')
             wireless_back_btn.configure(state='normal')
             threading.Thread(target=re_checkup,daemon=True).start()
             if connection_process.returncode == 0:
@@ -314,11 +314,11 @@ def connecting_service(device_name,device_id,pin_pair=False):
             if n != 120:
                 if n%30 == 0:
                     if messagebox.askyesno("Longer Than Expected?",message = "Recommendations:\n  • Disable WiFi Throttling.\n  • Try turning Wireless Debugging OFF and then ON.\nClick Yes to abort the auto-connection"):
-                        # print('aborting')
+                        print('aborting')
                         if CURRENT_MENU == "QR_CODE_PAIRING_MENU" or CURRENT_MENU == "PIN_PAIRING_MENU":
-                            # print('aborted')
+                            print('aborted')
                             back_btn_wireless_pairing()
-                            # print("abortion complete")
+                            print("abortion complete")
                             break
             else:
                 threading.Thread(target=messagebox.showinfo,args=("Connection Aborted","The connection was automatically stopped because it took more than 2 minutes. Please check your device and try again.")).start()
@@ -900,48 +900,31 @@ def wireless_connection_setup():
         window_name = f"{current_selection} {device_id}"
         phone_ip = subprocess.run(["adb", "-s", device_id, "shell", "ifconfig", "wlan0"],shell=True,capture_output=True,).stdout.decode()
         global bg_color_main, vid_playback_wireless
-        if bg_color_main == "#1f1f1f":
-            path_vid = r"vids\\White_phone_disconnect_v1.0.mp4"
-        elif bg_color_main == "#e0e0e0":
-            path_vid = r"vids\\Black_phone_disconnect_V3.1.mp4"
+        # if bg_color_main == "#1f1f1f":
+        #     path_vid = r"vids\\White_phone_disconnect_v1.0.mp4"
+        # elif bg_color_main == "#e0e0e0":
+        #     path_vid = r"vids\\Black_phone_disconnect_V3.1.mp4"
+        path_vid = r"vids\\White_phone_disconnect_v1.0.mp4"
         if len(phone_ip) == 0:
             messagebox.showerror("USB Connection Error",message=f"{current_selection} isn't connected via a USB cable",)
-            threading.Thread(target=re_checkup,daemon=True).start()
         elif "inet addr:" not in phone_ip:
             messagebox.showerror("Network Error",message=f"{current_selection} isn't connected to a network",)
         else:
-            raw_full_addr = phone_ip.splitlines()[1]
-            raw_full_addr = raw_full_addr.removeprefix("          inet addr:")
-            raw_full_addr = raw_full_addr.split(" ")
-            phone_ip = raw_full_addr[0]
-            if len(Active_Routes) != 0:
-                for index,value in enumerate(Active_Routes):
-                    try:
-                        subprocess.run(value[device_id].split(" "),shell=True,capture_output=True)
-                        Active_Routes.pop(index)
-                        break
-                    except KeyError:
-                        pass
-            if bool(Running_tasks_pid) != False:
+            phone_ip = phone_ip.splitlines()[1].removeprefix("          inet addr:").split(" ")[0]
+            for index,value in enumerate(Active_Routes):
                 try:
-                    pid = Running_tasks_pid[device_id]
-                    filter_id = f"PID eq {pid}"
-                    check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
-                    if "No tasks are running" in check_task_pid:
-                        ping_check, route_status = route_n_ping(Route_Traffic,phone_ip,IPv4_gate,Interface_Index,device_id)
-                        if ping_check and route_status == "ROUTE_SUCCESS":
-                            wireless_connection_setup_handle(IPv4_gate,Interface_subnet,current_selection,device_id,path_vid,window_name,phone_ip,ping_check)
-                        else:
-                            messagebox.showerror("Insuffeicient Permissions",message=f"Admin privilege is required to route traffic to the preferred network adapter",)
-                    else:
-                        messagebox.showerror("Screen Share Error", message="Task already exists")
+                    subprocess.run(value[device_id].split(" "),shell=True,capture_output=True)
+                    Active_Routes.pop(index)
+                    break
                 except KeyError:
-                    ping_check, route_status = route_n_ping(Route_Traffic,phone_ip,IPv4_gate,Interface_Index,device_id)
-                    if ping_check and route_status == "ROUTE_SUCCESS":
-                        wireless_connection_setup_handle(IPv4_gate,Interface_subnet,current_selection,device_id,path_vid,window_name,phone_ip,ping_check)
-                    else:
-                        messagebox.showerror("Insuffeicient Permissions",message=f"Admin privilege is required to route traffic to the preferred network adapter",)
-            else:
+                    pass
+            try:
+                pid = Running_tasks_pid[device_id]
+                filter_id = f"PID eq {pid}"
+                check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
+                if "No tasks are running" not in check_task_pid:
+                    messagebox.showerror("Screen Share Error", message="Task already exists")
+            except KeyError:
                 ping_check, route_status = route_n_ping(Route_Traffic,phone_ip,IPv4_gate,Interface_Index,device_id)
                 if ping_check and route_status == "ROUTE_SUCCESS":
                     wireless_connection_setup_handle(IPv4_gate,Interface_subnet,current_selection,device_id,path_vid,window_name,phone_ip,ping_check)
@@ -969,63 +952,115 @@ def screen_share_scrcpy():
             if i[0] == current_selection:
                 device_id = list(devices.keys())[index]
         window_name = f"{current_selection} {device_id}"
-        if bool(Running_tasks_pid) != False:
-            try:
-                pid = Running_tasks_pid[device_id]
-                filter_id = f"PID eq {pid}"
-                check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
-                if "No tasks are running" in check_task_pid:
-                    screen_share_scrcpy_handle(window_name, device_id, current_selection)
-                else:
-                    messagebox.showerror("Screen Share Error", message="Task already exists")
-                    threading.Thread(target=re_checkup,daemon=True).start()
-            except KeyError:
-                screen_share_scrcpy_handle(window_name, device_id , current_selection)
-        else:
-            screen_share_scrcpy_handle(window_name, device_id, current_selection)
+        try:
+            pid = Running_tasks_pid[device_id]
+            filter_id = f"PID eq {pid}"
+            check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
+            if "No tasks are running" not in check_task_pid:
+                messagebox.showerror("Screen Share Error", message="Task already exists")
+        except KeyError:
+            screen_share_scrcpy_handle(window_name, device_id , current_selection)
     except TclError:
-        threading.Thread(target=re_checkup,daemon=True).start()
+        pass
+    threading.Thread(target=re_checkup,daemon=True).start()
 
 
 def file_download():
     raise NotImplementedError
     all_btn_activity("disabled")
+    all_btn_command(False)
     try:
         current_selection = devices_list.get(devices_list.curselection())
         for index, i in enumerate(devices.values()):
             if i[0] == current_selection:
                 device_id = list(devices.keys())[index]
         window_name = f"{current_selection} {device_id}"
-        if bool(Running_tasks_pid) != False:
-            try:
-                pid = Running_tasks_pid[device_id]
-                filter_id = f"PID eq {pid}"
-                check_task_pid = subprocess.run(
-                    ["tasklist", "/fi", filter_id, "/fo", "list"],
-                    shell=True,
-                    capture_output=True,
-                ).stdout.decode()
-                if "No tasks are running" in check_task_pid:
-                    # code without checking for task
-                    pass
-                else:
-                    messagebox.showerror(
-                        "Multiple Tasks Requested",
-                        message="Another Task Already Exist",
-                    )
-                    all_btn_activity("normal")
-            except:
-                # code without checking for task
-                pass
-        else:
-            # code without checking for task
+        try:
+            pid = Running_tasks_pid[device_id]
+            filter_id = f"PID eq {pid}"
+            check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
+            if "No tasks are running" not in check_task_pid:
+                messagebox.showerror("Multiple Tasks Requested",message="Another Task Already Exist",)
+        except KeyError:
+            # adb pull
             pass
-    except:
-        all_btn_activity("normal")
+
+    except TclError:
+        threading.Thread(target=re_checkup,daemon=True).start()
 
 
 def file_upload():
-    raise NotImplementedError
+    all_btn_activity("disabled")
+    all_btn_command(False)
+    try:
+        current_selection = devices_list.get(devices_list.curselection())
+        for index, i in enumerate(devices.values()):
+            if i[0] == current_selection:
+                device_id = list(devices.keys())[index]
+        window_name = f"{current_selection} {device_id}"
+        try:
+            pid = Running_tasks_pid[device_id]
+            filter_id = f"PID eq {pid}"
+            check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
+            if "No tasks are running" not in check_task_pid:
+                messagebox.showerror("Multiple Tasks Requested",message="Another Task Already Exist",)
+        except KeyError:
+            file_upload_handle(device_id)
+            # emulated/0 (primary storage) (or other volumes)
+            # check for remaining storage
+            # ask for files/dir
+            # calculate size
+            # check file names exceptions
+            # adb push data / make dir
+            # progress monitor
+            filedialog.askopenfilenames(initialdir=os.environ["USERPROFILE"])
+    except TclError:
+        pass
+    threading.Thread(target=re_checkup,daemon=True).start()
+
+
+def file_upload_handle(device_id):
+    list_volumes = subprocess.run(["adb","-s", device_id, "shell", "sm", "list-volumes", "emulated"], shell=True, capture_output=True).stdout.decode().splitlines()
+    available_volumes = set()
+    for volume in list_volumes:
+        match = re.search(r"(\d+)\s*(\w+)\s", volume)
+        if match:
+            storage_id, status = match.groups()
+            if status == "mounted":
+                perm_check = subprocess.run(["adb","-s", device_id, "shell","ls", f"/storage/emulated/{storage_id}"],shell=True, capture_output=True).stderr.decode().strip()
+                if not (f"ls: /storage/emulated/{storage_id}: Permission denied" == perm_check):
+                    available_volumes.add((storage_id, "emulated"))
+
+    list_volumes = subprocess.run(["adb","-s", device_id, "shell", "sm", "list-volumes", "public"], shell=True, capture_output=True).stdout.decode().splitlines()
+    for volume in list_volumes:
+        match = re.search(r"public:(\d+,\d+)\s+(\w+)\s+([\w-]+)", volume)
+        if match:
+            status, storage_id = match.group(2), match.group(3)
+            if status == "mounted":
+                perm_check = subprocess.run(["adb","-s", device_id, "shell","ls", f"/storage/{storage_id}"],shell=True, capture_output=True).stderr.decode().strip()
+                if not (f"ls: /storage/{storage_id}: Permission denied" == perm_check):
+                    available_volumes.add((storage_id, "public"))
+    
+
+    if not bool(available_volumes):
+        print("No mounted volumes found or accessible for reading.")
+    else:
+        print(available_volumes)
+        storage_check = subprocess.run(["adb","-s", device_id, "shell", "df | grep /storage"],shell=True, capture_output=True).stdout.decode().splitlines()
+        for disk in storage_check:
+            match = re.search(r"/dev/fuse\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+%)\s+/storage/(\w+)", disk)
+            print(match.groups())
+            if match:
+                available_space, percentage_used, storage_type = match.group(3), match.group(4), match.group(5)
+
+        
+        # default behavoir choose volume 0 (primary storage)
+        if "0" in available_volumes:
+            pass
+
+    
+        
+
 
 
 def open_shell_handle(device_id, current_selection):
@@ -1063,116 +1098,145 @@ def open_shell():
 
 
 
-def repeat_until_success(index, i, connected_devices_vals, n):
-    i = f"{i} {n}"
-    if i in connected_devices_vals:
-        i = i.removesuffix(f" {n}")
-        n += 1
-        repeat_until_success(index, i, connected_devices_vals, n)
-    else:
-        connected_devices_vals[index] = i
+def adjust_device_name_duplicates(connected_devices):
+    device_name_counts = defaultdict(int)
+    connected_devices_vals = list(connected_devices.values())
 
-def find_duplicates(serial_number_duplicate_devices):
-    counter = Counter(serial_number_duplicate_devices)
-    duplicates = [value for value, count in counter.items() if count > 1]
-    return duplicates
+    for device_name, serial_number in connected_devices_vals:
+        device_name_counts[device_name] += 1
 
+    for i, (device_name, serial_number) in enumerate(connected_devices_vals):
+        count = device_name_counts[device_name]
+        if count > 1:
+            n = 1
+            new_name = device_name
+            while device_name_counts[new_name] > 1:
+                new_name = f"{device_name} ({n})"
+                n += 1
+            connected_devices_vals[i] = (new_name, serial_number)
+            device_name_counts[new_name] += 1
+
+    connected_devices.update(zip(connected_devices.keys(), connected_devices_vals))
+
+
+def get_device_info(device_id):
+    device_name = subprocess.run(
+        ["adb", "-s", device_id, "shell", "getprop", "ro.product.model"],
+        shell=True, capture_output=True
+    ).stdout.decode().strip()
+    
+    serial_number = subprocess.run(
+        ["adb", "-s", device_id, "shell", "getprop", "ro.serialno"],
+        shell=True, capture_output=True
+    ).stdout.decode().strip()
+
+    return device_name, serial_number
+
+def check_task_running(device_id, device_name, serial_number, serial_number_running_tasks):
+    try:
+        pid = Running_tasks_pid[device_id]
+        filter_id = f"PID eq {pid}"
+        check_task_pid_output = subprocess.run(
+            ["tasklist", "/fi", filter_id, "/fo", "list"],
+            shell=True, capture_output=True
+        ).stdout.decode()
+        
+        if "No tasks are running" not in check_task_pid_output:
+            device_name += " (Task Running)"
+            serial_number_running_tasks.add(serial_number)
+    except KeyError:
+        pass
+
+def handle_task_running_flags(connected_devices, serial_number_running_tasks):
+    for device_id, (device_name, serial_number) in connected_devices.items():
+        if serial_number in serial_number_running_tasks and " (Task Running)" not in device_name:
+            if not any(error in device_name for error in ["Permission Error", "Unauthorized", "Offline"]):
+                connected_devices[device_id] = (device_name + ' (Task Running)', serial_number)
+
+def filter_devices_by_connection_type(connected_devices, connection_type, serial_number_duplicate_devices):
+    if connection_type == "Any":
+        return
+
+    devices_to_remove = []
+    for device_id, (device_name, serial_number) in connected_devices.items():
+        if serial_number in serial_number_duplicate_devices:
+            if (connection_type == "Wireless" and "Wireless" not in device_name) or \
+               (connection_type == "Wired" and "Wireless" in device_name):
+                subprocess.run(["adb", "disconnect", device_id], shell=True, capture_output=True)
+                devices_to_remove.append(device_id)
+    
+    for device_id in devices_to_remove:
+        connected_devices.pop(device_id, None)
+
+def place_buttons(connected_devices):
+    for device_name, serial_number in sorted(connected_devices.values()):
+        if "Unauthorized" in device_name:
+            unauthorized_noti_btn.place(x=window_size[0]*0.825, y=window_size[1]*0.4)
+            UNAUTHORIZED_BUTTON_PLACEMENT = True
+        elif "Offline" in device_name:
+            offline_noti_btn.place(x=window_size[0]*0.825, y=window_size[1]*(29/60))
+            OFFLINE_BUTTON_PLACEMENT = True
+        elif "Permission Error" in device_name:
+            permission_error_btn.place(x=window_size[0]*0.825, y=window_size[1]*(17/30))
+            PERMISSION_ERROR_PLACEMENT = True
+        else:
+            devices_list.insert(END, device_name)
+
+def configure_device_list_items():
+    for i in range(devices_list.size()):
+        bg_color = "#1a8cff" if i % 2 == 0 else "#ffff00"
+        devices_list.itemconfigure(i, bg=bg_color)
 
 def checkup():
     global UNAUTHORIZED_BUTTON_PLACEMENT,OFFLINE_BUTTON_PLACEMENT, PERMISSION_ERROR_PLACEMENT
     connected_devices = dict()
-    serial_number_running_tasks = list()
-    serial_number_duplicate_devices = list()
+    serial_number_running_tasks = set()
+    serial_number_duplicate_devices = set()
+
     try:
         connection_type = preferred_interface_opt.get()
     except TclError:
-        preferred_interface_opt.set("Any")
         connection_type = "Any"
-    attached = subprocess.run(["adb", "devices"], shell=True, capture_output=True).stdout.decode().splitlines()[1:]
-    for i in attached:
-        if len(i) != 0:
-            try:
-                i = i.split("\t")
-                device_id = i[0]
-                device_state = i[1]
-            except IndexError:
-                continue
-            if "._adb-tls-connect._tcp." in device_id:
-                subprocess.run(["adb","disconnect",device_id],shell=True,capture_output=True)
-                continue
-            if device_state == "device":
-                device_name = subprocess.run(["adb","-s",device_id,"shell","getprop","ro.product.model",],shell=True,capture_output=True)
-                serial_number = subprocess.run(["adb","-s",device_id,"shell","getprop","ro.serialno",],shell=True,capture_output=True)
-                if "Permission denied" in device_name.stderr.decode():
-                    device_name = f"Permission Error {device_id}"
-                else:
-                    device_name = device_name.stdout.decode().removesuffix("\r\n")
-                    if ":" in device_id:
-                        device_name += ' Wireless'
-                if "Permission denied" in serial_number.stderr.decode():
-                    serial_number = f"Permission Error {device_id}"
-                else:
-                    serial_number = serial_number.stdout.decode().removesuffix('\r\n')
-                    serial_number_duplicate_devices.append(serial_number)
-                if bool(Running_tasks_pid):
-                    try:
-                        pid = Running_tasks_pid[device_id]
-                        filter_id = f"PID eq {pid}"
-                        check_task_pid = subprocess.run(["tasklist", "/fi", filter_id, "/fo", "list"],shell=True,capture_output=True,).stdout.decode()
-                    except KeyError:
-                        check_task_pid = "No tasks are running"
-                    if "No tasks are running" not in check_task_pid:
-                        device_name += ' (Task Running)'
-                        serial_number_running_tasks.append(serial_number)
-                connected_devices[device_id] = (device_name,serial_number)
-            elif device_state == "unauthorized":
-                connected_devices[device_id] = (f"Unauthorized","Unauthorized")
-            elif device_state == "offline":
-                connected_devices[device_id] = (f"Offline","Offline")
-    for i in serial_number_running_tasks:
-        for dev_id,dev_name_serial in connected_devices.items():
-            dev_name,dev_serial = dev_name_serial
-            if i == dev_serial and " (Task Running)" not in dev_name and not any(error in dev_name for error in ["Permission Error","Unauthorized","Offline"]):
-                dev_name += ' (Task Running)'
-                connected_devices[dev_id] = (dev_name,dev_serial)
-    if connection_type != "Any":
-        serial_number_duplicate_devices = find_duplicates(serial_number_duplicate_devices)
-        devices_id_duplicates = list()
-        for i in serial_number_duplicate_devices:
-            for dev_id, dev_name_serial in connected_devices.items():
-                if dev_name_serial[1] == i:
-                    devices_id_duplicates.append((dev_id,dev_name_serial[0],dev_name_serial[1]))
-        for dev_id,dev_name,dev_serial in devices_id_duplicates:
-            if connection_type == "Wireless":
-                if "Wireless" not in dev_name:
-                    connected_devices.pop(dev_id)
-            elif connection_type == "Wired":
-                if "Wireless" in dev_name:
-                    subprocess.run(["adb","disconnect",dev_id],shell=True,capture_output=True)
-                    connected_devices.pop(dev_id)
-    connected_devices_vals = list(connected_devices.values())
-    for index, i in enumerate(connected_devices_vals):
-        if connected_devices_vals.count(i[0]) > 1:
-            n = 1
-            repeat_until_success(index, i[0], connected_devices_vals, n)
-    connected_devices = dict(zip(connected_devices.keys(), connected_devices_vals))
-    for i, serial in sorted(connected_devices.values()):
-        if "Unauthorized" in i:
-            unauthorized_noti_btn.place(x=window_size[0]*0.825, y=window_size[1]*0.4)
-            UNAUTHORIZED_BUTTON_PLACEMENT = True
-        elif "Offline" in i:
-            offline_noti_btn.place(x=window_size[0]*0.825, y=window_size[1]*(29/60))
-            OFFLINE_BUTTON_PLACEMENT = True
-        elif "Permission Error" in i:
-            permission_error_btn.place(x=window_size[0]*0.825, y=window_size[1]*(17/30))
-            PERMISSION_ERROR_PLACEMENT = True
+        preferred_interface_opt.set(connection_type)
+        
+
+    attached_devices_output = subprocess.run(["adb", "devices"], shell=True, capture_output=True).stdout.decode().splitlines()[1:]
+    for device_info in attached_devices_output :
+        if not device_info:
+            continue
+        device_id, device_state = device_info.split("\t")[:2]
+
+        if "._adb-tls-connect._tcp." in device_id:
+            subprocess.run(["adb","disconnect",device_id],shell=True,capture_output=True)
+            continue
+
+        if device_state == "device":
+            device_name, serial_number = get_device_info(device_id) 
+            if "Permission denied" in device_name:
+                device_name = f"Permission Error {device_id}"
+            else:
+                if ":" in device_id:
+                    device_name += " Wireless"
+            
+            if "Permission denied" in serial_number:
+                serial_number = f"Permission Error {device_id}"
+            else:
+                serial_number_duplicate_devices.add(serial_number)
+            
+            check_task_running(device_id, device_name, serial_number, serial_number_running_tasks)
+
+            connected_devices[device_id] = (device_name,serial_number)
         else:
-            devices_list.insert(END, i)
-    for i in range(devices_list.size()):
-        if i % 2 == 0:
-            devices_list.itemconfigure(i, bg="#1a8cff")
-        else:
-            devices_list.itemconfigure(i, bg="#ffff00")
+            device_name = device_state.capitalize()
+            connected_devices[device_id] = (device_name, device_name)
+
+    handle_task_running_flags(connected_devices, serial_number_running_tasks)
+    filter_devices_by_connection_type(connected_devices, connection_type, serial_number_duplicate_devices)
+    adjust_device_name_duplicates(connected_devices)
+
+    place_buttons(connected_devices)
+    configure_device_list_items()
+            
     return connected_devices
 
 def re_checkup():
