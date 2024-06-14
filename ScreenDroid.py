@@ -1277,11 +1277,11 @@ def unauthorized_message():
         if "Unauthorized" in value:
             Unauthorized_list.append(key)
     if len(Unauthorized_list) > 1:
-        Unauthorized_devices = "\n".join(Unauthorized_devices)
-        messagebox.showinfo(f"Unauthorized Devices Detected",message=f"1.) Enable USB Debugging\n2.) Authorize this computer\nThe following devices are unauthorized:\n{Unauthorized_devices}")
+        Unauthorized_devices = "\n    •  ".join(Unauthorized_list)
+        messagebox.showinfo(f"Unauthorized Devices Detected",message=f"1. Enable USB Debugging\n2. Authorize this computer\nThe following devices are unauthorized:\n    •  {Unauthorized_devices}")
     else:
-        Unauthorized_devices = Unauthorized_devices[0]
-        messagebox.showinfo(f"Unauthorized Device Detected",message=f"1.) Enable USB Debugging\n2.) Authorize this computer\nThe following fevice is unauthorized:\n{Unauthorized_devices}")
+        Unauthorized_devices = Unauthorized_list[0]
+        messagebox.showinfo(f"Unauthorized Device Detected",message=f"1. Enable USB Debugging\n2. Authorize this computer\nThe following device is unauthorized:\n    •  {Unauthorized_devices}")
 
 def permission_message():
     permission_list = []
@@ -1289,11 +1289,11 @@ def permission_message():
         if "Permission Error" in value:
             permission_list.append(key)
     if len(permission_list) > 1:
-        permission_devices = "\n".join(permission_list)
-        messagebox.showinfo("Permission Issue Detected",f"Your devices lacks the necessary permissions for this operation.\n\nPlease follow these steps to resolve the issue:\n\n1.) Go to 'Rooted Debugging' or 'Root Access Options'.\n2.) Change the setting to 'ADB only' or grant ADB root access through your root manager.\n3.) It may be necessary to reboot your devices.\n\nDevices with Insufficient Permissions:\n{permission_devices}")
+        permission_devices = "\n    •  ".join(permission_list)
+        messagebox.showinfo("Permission Issue Detected",f"Your devices lacks the necessary permissions for this operation.\n\nPlease follow these steps to resolve the issue:\n\n1. Go to 'Rooted Debugging' or 'Root Access Options'.\n2. Change the setting to 'ADB only' or grant ADB root access through your root manager.\n3. It may be necessary to reboot your devices.\n\nDevices with Insufficient Permissions:\n    •  {permission_devices}")
     else:
         permission_devices = permission_list[0]
-        messagebox.showinfo("Permission Issue Detected",f"Your device lacks the necessary permissions for this operation.\n\nPlease follow these steps to resolve the issue:\n\n1.) Go to 'Rooted Debugging' or 'Root Access Options'.\n2.) Change the setting to 'ADB only' or grant ADB root access through your root manager.\n3.) It may be necessary to reboot your device.\n\nDevice with Insufficient Permissions:\n{permission_devices}")
+        messagebox.showinfo("Permission Issue Detected",f"Your device lacks the necessary permissions for this operation.\n\nPlease follow these steps to resolve the issue:\n\n1. Go to 'Rooted Debugging' or 'Root Access Options'.\n2. Change the setting to 'ADB only' or grant ADB root access through your root manager.\n3. It may be necessary to reboot your device.\n\nDevice with Insufficient Permissions:\n    •  {permission_devices}")
 
 def offline_message():
     offline_list = list()

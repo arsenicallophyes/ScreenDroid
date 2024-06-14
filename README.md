@@ -53,7 +53,6 @@ We welcome feedback from the community to improve and stabilize the application.
 We are aware of the following issues with our app:
 
 - There is a minor issue with the new QR code pairing via Zeroconf, where the app occasionally fails to connect to the phone. This happens because the phone may stop sending mDNS requests at regular intervals, preventing the app from detecting it. To avoid this problem, turn on wireless debugging only when you need to use the QR code pairing feature and turn it off when not in use, rather than leaving it on all the time.
-- If the program calls `adb devices` and the device state returns unauthorized or a permission error occurs (usually when the device is rooted), a button should pop up indicating which devices are unauthorized or have permission errors and how to fix them. However, in the new version, the button doesn't work.
 - Certain elements will not resize properly. As mentioned earlier, resizing is in beta, and this is a known issue.
 
 ## Fixed Issues
