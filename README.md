@@ -159,6 +159,20 @@ os.environ['PATH'] = os.path.dirname(__file__) + os.pathsep + os.environ['PATH']
 ```
 Next, move the `lib` folder from `addons/lib` to the parent directory and download and extract the [`bin`](https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2023-05-31-12-47/ffmpeg-N-110946-g859c34706d-win64-gpl.zip) folder into the parent directory.
 
+You should have the following folder tree structure:
+```
+.
+├── ScreenDroid.py
+├── lib/
+│   └── *.dll
+├── addons/
+│   ├── vids/
+│   ├── Android.ico
+│   └── *.*
+└── bin/
+    └── ffmpeg.exe
+```
+
 Once you have installed the dependencies, made the necessary code modification, and moved the required folders, use the following command to compile the application with Nuitka:
 
 
