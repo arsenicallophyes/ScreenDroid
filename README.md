@@ -38,16 +38,15 @@ In order to use our app, the following requirements must be met:
 We have tested our app on the following devices:
 
 - Samsung Galaxy S10 (Android 12)
-- Samsung Galaxy J5 2016 (Android 10, Lineage OS 17)
-- Samsung Galaxy Tab 4 (Android 4.4.2)
-- Samsung Galaxy Note 10.1 (Android 9, Lineage OS 16)
+- Samsung Galaxy A73 (Android 14)
+- Samsung Galaxy Tab S7 FE (Android 14)
+- Samsung Galaxy A20s (Android 12)
 
-On the latest version, the app has only been tested on the Samsung Galaxy S10 (Android 12).
 
 ## Development
 
 Our app was developed and tested on Python 3.12.0.
-We welcome contributions and feedback from the community to improve and stabilize the application.
+We welcome feedback from the community to improve and stabilize the application.
 
 ## Known Issues
 
@@ -86,7 +85,7 @@ threading.Thread(target=multiple_instances_eliminator).start()
   2. **QR Code Generation**: A QR code is generated to encode the service information. This QR code can be scanned by the Android device to pair with the app.
   3. **Automatic Bonjour Installation**: If Bonjour is not installed, the app will request admin privileges to install it, ensuring smooth operation.
   4. **Admin Privileges Request**: The app will ask for admin privileges automatically during the first startup to install the necessary files.
-- **PIN Pairing with Autodetect**: We've introduced PIN pairing alongside QR code pairing. When attempting to connect via PIN, the app will automatically detect the IP address, port, and PIN to auto-complete the input section for convenience.
+- **PIN Pairing with Autodetect**: We've introduced PIN pairing alongside QR code pairing. When attempting to connect via PIN, the app will automatically detect the IP address, and port to auto-complete the input section for convenience.
 - **Network Verification**: All network operations involving connecting a phone will now verify the IP address within the network range and attempt to ping the device. Connection will only be established if both tests are successful. These options can be disabled from settings.
 - **Screen Off Option**: Users can now choose to turn off their phone screen while sharing the screen with their PC.
 - **Preferred Connection Method**:
