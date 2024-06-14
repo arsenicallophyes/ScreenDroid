@@ -4,7 +4,7 @@ ScreenDroid is an Android debugger that allows you to share your Android device'
 
 ## Features
 
-- Version 1 (Deprecated): Supports one device at a time and has a limited set of features.
+- ADBV1 (Deprecated): Supports one device at a time and has a limited set of features.
 - Version 2: Supports multiple devices, routing traffic to a specific adapter, and has a full feature set. It also has a startup animation and prevents multiple instances of the process from running. It has keybinds for refreshing, killing processes, and exiting the application.
 - **New Feature**: QR Code Pairing with Zeroconf for seamless device pairing over the network.
 - **New Feature**: Window Resizing (Beta): Resizing the window is now enabled. This feature is currently in beta and not fully implemented, so some issues might occur. Using the default size should not have any issues.
