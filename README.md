@@ -122,3 +122,56 @@ from zeroconf import ServiceBrowser, Zeroconf
 from io import BytesIO
 from collections import Counter
 ```
+## Running the Script
+To run the script, follow these steps:
+  1. Install the required dependencies using the `requirements.txt` file included in the GitHub repository:
+```bash
+pip install -r requirements.txt
+```
+  2. Move the `ScreenDroid.py` file into the `addons` folder.
+
+After completing these steps, you can run the script as usual.
+
+## How to Compile
+
+To compile the ScreenDroid application, you will need the following dependencies:
+
+- Pillow>=10.0.1
+- imageio==2.4.1
+- qrcode>=7.4.2
+- zeroconf==0.119.0
+- imageio-ffmpeg==0.4.9
+- Nuitka==2.3
+
+You can install these dependencies using pip:
+
+```bash
+pip install Pillow>=10.0.1 imageio==2.4.1 qrcode>=7.4.2 zeroconf==0.119.0 imageio-ffmpeg==0.4.9 Nuitka==2.3
+```
+Make sure to use `Python 3.12.0` for compiling. It may work with newer versions of Python, but it has not been tested.
+
+You also need to modify a line in the `ScreenDroid.py` file. Change this line:
+```python
+os.environ['PATH'] = rf"{os.path.dirname(__file__)}\lib" + os.pathsep + os.environ['PATH']
+```
+to:
+```python
+os.environ['PATH'] = os.path.dirname(__file__) + os.pathsep + os.environ['PATH']
+```
+Next, move the `lib` folder from `addons/lib` to the parent directory and download and extract the [`bin`](https://github.com/BtbN/FFmpeg-Builds/releases/download/autobuild-2023-05-31-12-47/ffmpeg-N-110946-g859c34706d-win64-gpl.zip) folder into the parent directory.
+
+Once you have installed the dependencies, made the necessary code modification, and moved the required folders, use the following command to compile the application with Nuitka:
+
+
+```bash
+nuitka "ScreenDroid.py" --standalone --onefile --enable-plugin=tk-inter --include-data-dir="addons"=./ --windows-icon-from-ico="addons\Android.ico" --include-module=imageio_ffmpeg --include-data-file="bin\\ffmpeg.exe"=./ --include-module=threading --include-module=PIL._imagingtk --include-module=tkinter --windows-console-mode=disable --include-data-file="lib\libbrotlicommon.dll"=./ --include-data-file="lib\libbrotlidec.dll"=./ --include-data-file="lib\libbz2-1.dll"=./ --include-data-file="lib\libcairo-2.dll"=./ --include-data-file="lib\libexpat-1.dll"=./ --include-data-file="lib\libfontconfig-1.dll"=./ --include-data-file="lib\libfreetype-6.dll"=./ --include-data-file="lib\libgcc_s_seh-1.dll"=./ --include-data-file="lib\libglib-2.0-0.dll"=./ --include-data-file="lib\libgraphite2.dll"=./ --include-data-file="lib\libharfbuzz-0.dll"=./ --include-data-file="lib\libiconv-2.dll"=./ --include-data-file="lib\libintl-8.dll"=./ --include-data-file="lib\libpcre-1.dll"=./ --include-data-file="lib\libpixman-1-0.dll"=./ --include-data-file="lib\libpng16-16.dll"=./ --include-data-file="lib\libstdc++-6.dll"=./ --include-data-file="lib\libwinpthread-1.dll"=./ --include-data-file="lib\zlib1.dll"=./lib
+```
+This command will compile ScreenDroid.py into a standalone executable with all necessary dependencies included.
+
+
+
+
+
+
+
+
